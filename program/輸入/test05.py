@@ -87,6 +87,7 @@ class RFTransmitter:
                 for i in range(1, 11):
                     if not self.transmitting:
                         break
+                    st = i%10
                     self.send_data(str(i))
                     print("發送數據：", i)
                     self.out_logging(i)
@@ -95,17 +96,19 @@ class RFTransmitter:
                 for i in range(1, 101):
                     if not self.transmitting:
                         break
-                    self.send_data(str(i))
-                    print("發送數據：", i)
-                    self.out_logging(i)
+                    st = i%10
+                    self.send_data(str(i%10)+'\n')
+                    print("發送數據：", st)
+                    self.out_logging(st)
                     time.sleep(0.1)
             elif mode == "每10ms發射1到1000":
                 for i in range(1, 1001):
                     if not self.transmitting:
                         break
-                    self.send_data(str(i))
-                    print("發送數據：", i)
-                    self.out_logging(i)
+                    st = i%10
+                    self.send_data(str(st))
+                    print("發送數據：", st)
+                    self.out_logging(st)
                     time.sleep(0.01)
         except Exception as e:
             print("發射出錯：", e)
