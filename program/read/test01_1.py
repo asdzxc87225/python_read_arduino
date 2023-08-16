@@ -15,11 +15,14 @@ class SerialDataLogger:
     def start_logging(self):
         try:
             while True:
-                data = self.ser.readline().decode('ascii', errors='replace').strip()
+                #data = self.ser.readline().decode('ascii', errors='replace').strip()
+                data = self.ser.read(1)
+                data = hex(data[0])
+                #data = data.hexlify(binary_data).decode('utf-8')
+                print(type(data))
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-                self.log_file.write(f"{timestamp}, {data}\n")
-                print(f"{timestamp}, {data}\n")
-                time.sleep(0.001)
+                self.log_file.write(f"{timestamp}: {data}\n")
+                print(f"{timestamp}: {data}\n")
         except KeyboardInterrupt:
             self.stop_logging()
 
@@ -30,6 +33,6 @@ class SerialDataLogger:
         self.ser.close()
 
 if __name__ == '__main__':
-    serial_logger = SerialDataLogger('/dev/ttyACM0', 9600)
+    serial_logger = SerialDataLogger('/dev/ttyUSB0', 9600)
     serial_logger.start_logging()
 

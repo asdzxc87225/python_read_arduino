@@ -75,10 +75,11 @@ class RFTransmitter:
         self.transmitting = False
         current_time = time.strftime("%Y%m%d_%H%M%S")
         self.log_filename = current_time + ".log"
-        self.log_file = open(self.log_filename, 'w')
+        self.log_file = open(self.log_filename, 'a')
 
     def send_data(self, data):
-        self.ser.write(data.encode())
+        outData = bytes([data%256])
+        self.ser.write(outData)
 
     def start_transmission(self, mode):
         self.transmitting = True
@@ -87,39 +88,36 @@ class RFTransmitter:
                 for i in range(1, 11):
                     if not self.transmitting:
                         break
-                    st = i%10
-                    self.send_data(str(i))
-                    print("發送數據：", i)
+                    self.send_data(i)
                     self.out_logging(i)
                     time.sleep(1)
             elif mode == "每100ms發射1到100":
                 for i in range(1, 101):
                     if not self.transmitting:
                         break
-                    st = i%10
-                    self.send_data(str(i%10)+'\n')
-                    print("發送數據：", st)
-                    self.out_logging(st)
+                    self.send_data(i)
+                    self.out_logging(i)
                     time.sleep(0.1)
             elif mode == "每10ms發射1到1000":
                 for i in range(1, 1001):
                     if not self.transmitting:
                         break
-                    st = i%10
-                    self.send_data(str(st))
-                    print("發送數據：", st)
-                    self.out_logging(st)
+                    self.send_data(i)
+                    self.out_logging(i)
                     time.sleep(0.01)
         except Exception as e:
             print("發射出錯：", e)
 
 
     def out_logging(self,data1):
+        data2 = hex(data1%256)
+        print("發送次數：", data1,"\t發送資料",data2)
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-        self.log_file.write(f"{timestamp}, {str(data1)}\n")
+        self.log_file.write(f"{timestamp}: {data2}\n")
 
     def stop_transmission(self):
         self.transmitting = False
+        self.log_file.close()
         self.ser.close()
 if __name__ == '__main__':
     app = QApplication(sys.argv)
