@@ -1,6 +1,7 @@
 import sys
 import serial
 import time
+import threading
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QComboBox, QVBoxLayout, QWidget
 from datetime import datetime
 
@@ -59,8 +60,10 @@ class RFTransmitterQtApp(QMainWindow):
             mode = self.mode_combobox.currentText()
             self.transmit_button.setText("停止發射")
             self.status_label.setText(f"發射狀態：{mode}中...")
-            self.transmitter.start_transmission(mode)
+            thread = threading.Thread(target=self.transmitter.start_transmission,args=(mode,))   # 定义线程
+            thread.start()
         else:
+            print("\n==================================================================")
             self.transmitter.stop_transmission()
             self.transmit_button.setText("開始發射")
             self.status_label.setText("發射狀態：等待發射")
