@@ -81,8 +81,17 @@ class RFTransmitter:
         self.log_file = open(self.log_filename, 'a')
 
     def send_data(self, data):
-        outData = bytes([data%256])
+        data1 = [0 for x in range(0,10)]
+        data1[0] = data
+        for x in range(len(data1)):
+            if x < len(data1)-1:
+                data1[x+1] = data1[x]//256
+                data1[x] =data1[x]%256
+            else :
+                data1[x] = data1[x]%256
+        outData = bytes(data1)
         self.ser.write(outData)
+        print("發送次數：", data,"\t發送資料",outData)
 
     def start_transmission(self, mode):
         self.transmitting = True
@@ -102,7 +111,7 @@ class RFTransmitter:
                     self.out_logging(i)
                     time.sleep(0.1)
             elif mode == "每10ms發射1到1000":
-                for i in range(1, 1001):
+                for i in range(1, 10001):
                     if not self.transmitting:
                         break
                     self.send_data(i)
@@ -113,10 +122,8 @@ class RFTransmitter:
 
 
     def out_logging(self,data1):
-        data2 = hex(data1%256)
-        print("發送次數：", data1,"\t發送資料",data2)
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-        self.log_file.write(f"{timestamp}: {data2}\n")
+        self.log_file.write(f"{timestamp}: {hex(data1)}\n")
 
     def stop_transmission(self):
         self.transmitting = False
