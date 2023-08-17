@@ -44,18 +44,17 @@ class widget(QMainWindow):
         self.setCentralWidget(central_widget)
         self.transmitter = None
     def rum(self):
-        print('hi')
         if not self.transmitter:
             port = self.port_combobox.currentText()
             baud_rate = int(self.baud_combobox.currentText())
             self.transmitter = SerialDataLogger(port, baud_rate)
             self.transmit_button.setText("停止接收")
             self.status_label.setText(f"狀態：工作中")
-            thread = threading.Thread(target=self.transmitter.start_logging,)   # 定义线程
-            thread.start()
+            self.thread = threading.Thread(target=self.transmitter.start_logging,)   # 定义线程
+            self.thread.start()
         else:
-            print("\n==================================================================")
-            self.transmitter.stop_logging()
+            self.transmitter.stop = False
+           # self.transmitter.stop_logging()
             self.transmit_button.setText("開始接收")
             self.status_label.setText("狀態：休息中")
             self.transmitter = None
@@ -69,16 +68,22 @@ class SerialDataLogger:
         current_time = time.strftime("%Y%m%d_%H%M%S")
         self.log_filename = current_time + ".log"
         self.log_file = open(self.log_filename, 'w')
+        self.stop = True
 
     def start_logging(self):
         try:
             while True:
-                data = self.ser.read(1)
-                data = hex(data[0])
-                print(type(data))
-                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-                self.log_file.write(f"{timestamp}: {data}\n")
-                print(f"{timestamp}: {data}\n")
+                if self.stop != True:
+                    print('停下')
+                    self.stop_logging()
+                    break
+                else:
+                    data = self.ser.read(1)
+                    data = hex(data[0])
+                    print(type(data))
+                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                    self.log_file.write(f"{timestamp}: {data}\n")
+                    print(f"{timestamp}: {data}\n")
         except KeyboardInterrupt:
             self.stop_logging()
 
