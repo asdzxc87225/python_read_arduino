@@ -66,11 +66,13 @@ class RFTransmitterQtApp(QMainWindow):
         if not self.transmitter:
             port = self.port_combobox.currentText()
             baud_rate = int(self.baud_combobox.currentText())
-            self.transmitter = RFTransmitter(port, baud_rate)
-            mode = self.mode_combobox.currentText()
+            len_byte = int(self.target1.text())
+            count = int(self.target2.text())
+            delay = float(self.target3.text())
+            self.transmitter = RFTransmitter(port, baud_rate,len_byte,count,delay)
             self.transmit_button.setText("停止發射")
-            self.status_label.setText(f"發射狀態：{mode}中...")
-            thread = threading.Thread(target=self.transmitter.start_transmission,args=(mode,))   # 定义线程
+            self.status_label.setText(f"發射狀態：中...")
+            thread = threading.Thread(target=self.transmitter.start_transmission)   # 定义线程
             thread.start()
         else:
             print("\n==================================================================")
@@ -81,12 +83,12 @@ class RFTransmitterQtApp(QMainWindow):
 
 
 class RFTransmitter:
-    def __init__(self, port, baud_rate ):
+    def __init__(self, port, baud_rate, data_bytes, run_count, delaytime ):
         self.port = port
         self.baud_rate = baud_rate
-        self.run_count = 5
-        self.data_bitys = 1
-        self.delay_time = 0.01
+        self.run_count = run_count
+        self.data_bitys = data_bytes
+        self.delay_time = delaytime
         self.ser = serial.Serial(self.port, self.baud_rate, timeout=1)
         self.transmitting = False
         self.set_logging()
@@ -135,10 +137,10 @@ class RFTransmitter:
 
 
 if __name__ == '__main__':
-    #app = QApplication(sys.argv)
-    #window = RFTransmitterQtApp()
-    #window.show()
-    #sys.exit(app.exec_())
-    work = RFTransmitter('/dev/ttyUSB0','9600')
-    work.start_transmission()
+    app = QApplication(sys.argv)
+    window = RFTransmitterQtApp()
+    window.show()
+    sys.exit(app.exec_())
+#    work = RFTransmitter('/dev/ttyUSB0','9600')
+#    work.start_transmission()
 
