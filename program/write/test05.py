@@ -71,17 +71,18 @@ class RFTransmitterQtApp(QMainWindow):
 
 
 class RFTransmitter:
-    def __init__(self, port, baud_rate):
+    def __init__(self, port, baud_rate ):
         self.port = port
         self.baud_rate = baud_rate
+        self.run_count = 5
+        self.data_bitys = 1
+        self.delay_time = 0.01
         self.ser = serial.Serial(self.port, self.baud_rate, timeout=1)
         self.transmitting = False
-        current_time = time.strftime("%Y%m%d_%H%M%S")
-        self.log_filename = current_time + ".log"
-        self.log_file = open(self.log_filename, 'a')
+        self.set_logging()
 
     def send_data(self, data):
-        data1 = [0 for x in range(0,10)]
+        data1 = [0 for x in range(0,self.data_bitys)]
         data1[0] = data
         for x in range(len(data1)):
             if x < len(data1)-1:
@@ -93,45 +94,41 @@ class RFTransmitter:
         self.ser.write(outData)
         print("發送次數：", data,"\t發送資料",outData)
 
-    def start_transmission(self, mode):
+    def start_transmission(self):
         self.transmitting = True
         try:
-            if mode == "每秒發射1到10":
-                for i in range(1, 11):
-                    if not self.transmitting:
-                        break
-                    self.send_data(i)
-                    self.out_logging(i)
-                    time.sleep(1)
-            elif mode == "每100ms發射1到100":
-                for i in range(1, 101):
-                    if not self.transmitting:
-                        break
-                    self.send_data(i)
-                    self.out_logging(i)
-                    time.sleep(0.1)
-            elif mode == "每10ms發射1到1000":
-                for i in range(1, 10001):
-                    if not self.transmitting:
-                        break
-                    self.send_data(i)
-                    self.out_logging(i)
-                    time.sleep(0.01)
+            for i in range(1, self.run_count + 1):
+                if not self.transmitting:
+                    break
+                self.send_data(i)
+                self.out_logging(i)
+                time.sleep(self.delay_time)
         except Exception as e:
             print("發射出錯：", e)
 
+    def stop_transmission(self):
+        self.transmitting = False
+        self.stop_logging()
+        self.ser.close()
+
+    def set_logging(self):
+        current_time = time.strftime("%Y%m%d_%H%M%S")
+        self.log_filename = current_time + ".log"
+        self.log_file = open(self.log_filename, 'a')
 
     def out_logging(self,data1):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
         self.log_file.write(f"{timestamp}: {hex(data1)}\n")
 
-    def stop_transmission(self):
-        self.transmitting = False
+    def stop_logging(self):
         self.log_file.close()
-        self.ser.close()
+
+
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = RFTransmitterQtApp()
-    window.show()
-    sys.exit(app.exec_())
+    #app = QApplication(sys.argv)
+    #window = RFTransmitterQtApp()
+    #window.show()
+    #sys.exit(app.exec_())
+    work = RFTransmitter('/dev/ttyUSB0','9600')
+    work.start_transmission()
 
