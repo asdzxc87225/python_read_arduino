@@ -104,6 +104,7 @@ class RFTransmitter:
                 data1[x] = data1[x]%256
         outData = bytes(data1)
         self.ser.write(outData)
+        self.out_logging(outData)
         print("發送次數：", data,"\t發送資料",outData)
 
     def start_transmission(self):
@@ -113,7 +114,6 @@ class RFTransmitter:
                 if not self.transmitting:
                     break
                 self.send_data(i)
-                self.out_logging(i)
                 time.sleep(self.delay_time)
         except Exception as e:
             print("發射出錯：", e)
@@ -130,7 +130,7 @@ class RFTransmitter:
 
     def out_logging(self,data1):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-        self.log_file.write(f"{timestamp}: {hex(data1)}\n")
+        self.log_file.write(f"{timestamp}: {(data1)}\n")
 
     def stop_logging(self):
         self.log_file.close()
