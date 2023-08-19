@@ -79,7 +79,7 @@ class SerialDataLogger:
                     break
                 else:
                     data = self.ser.read(1)
-                    data = hex(data[0])
+                    #data = hex(data[0])
                     print(type(data))
                     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
                     self.log_file.write(f"{timestamp}: {data}\n")
