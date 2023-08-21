@@ -94,14 +94,8 @@ class RFTransmitter:
         self.set_logging()
 
     def send_data(self, data):
-        data1 = [0 for x in range(0,self.data_bitys)]
-        data1[0] = data
-        for x in range(len(data1)):
-            if x < len(data1)-1:
-                data1[x+1] = data1[x]//256
-                data1[x] =data1[x]%256
-            else :
-                data1[x] = data1[x]%256
+        data1 = [((x+1)%256) for x in range(0,self.data_bitys)]
+        data1[0] = data %256
         outData = bytes(data1)
         self.ser.write(outData)
         self.out_logging(outData)
@@ -141,6 +135,4 @@ if __name__ == '__main__':
     window = RFTransmitterQtApp()
     window.show()
     sys.exit(app.exec_())
-#    work = RFTransmitter('/dev/ttyUSB0','9600')
-#    work.start_transmission()
 
