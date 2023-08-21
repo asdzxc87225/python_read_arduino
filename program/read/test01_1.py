@@ -78,12 +78,16 @@ class SerialDataLogger:
                     self.stop_logging()
                     break
                 else:
-                    data = self.ser.read(1)
-                    #data = hex(data[0])
-                    print(type(data))
-                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-                    self.log_file.write(f"{timestamp}: {data}\n")
-                    print(f"{timestamp}: {data}\n")
+
+                    if (self.ser.in_waiting>0):
+                        data = self.ser.read(1)
+                        #data = hex(data[0])
+                        print(type(data))
+                        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                        self.log_file.write(f"{timestamp}: {data}\n")
+                        print(f"{timestamp}: {data}\n")
+                    else:
+                        print('no')
         except KeyboardInterrupt:
             self.stop_logging()
 
