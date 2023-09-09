@@ -43,20 +43,27 @@ class main_window(QMainWindow):
             self.port = self.port_combobox.currentText()
             self.baud = self.baud_combobox.currentText()
             self.ser = serial_read(self.port,self.baud)
-            self.ser.start_serial()
             self.flage = False
+            self.thread = threading.Thread(target=self.ser.start_serial)
+            self.thread.start()
         else:
-            self.ser.stop_serial()
             self.flage = True
+            self.ser.work_type = "stop"
 
 class serial_read():
     def __init__(self,serial_port,buad_rate):
         self.serial_port = serial_port
         self.baud_rate = buad_rate
+        self.work_type = "start"
     
     def start_serial(self):
         print("=================ser-start=================")
-        self.ser = serial.Serial(self.serial_port,self.baud_rate)
+        while self.work_type == "start":
+            self.ser = serial.Serial(self.serial_port,self.baud_rate)
+            data_raw = self.ser.readline()  # 讀取一行
+            data = data_raw.decode()   # 用預設的UTF-8解碼
+            print(data)
+        self.stop_serial()
         
 
     def stop_serial(self):
@@ -66,7 +73,6 @@ class serial_read():
         
 
 if __name__ == '__main__':
-    #serial = serial_read('/dev/ttyUSB0',9600)
     app = QApplication(sys.argv)
     From = main_window()
     From.show()
