@@ -62,6 +62,7 @@ class serial_read():
             self.ser = serial.Serial(self.serial_port,self.baud_rate)
             data_raw = self.ser.readline()  # 讀取一行
             data = data_raw.decode()   # 用預設的UTF-8解碼
+            print(data_raw)
             print(data)
         self.stop_serial()
         
