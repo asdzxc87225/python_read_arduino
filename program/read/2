@@ -46,22 +46,28 @@ class main_window(QMainWindow):
             self.ser.start_serial()
             self.flage = False
         else:
-            self.ser.stop_serial()
+            ser.stop_serial()
             self.flage = True
+
+            
+
+
 
 class serial_read():
     def __init__(self,serial_port,buad_rate):
         self.serial_port = serial_port
         self.baud_rate = buad_rate
+        self.start_serial()
+        self.stop_serial()
     
     def start_serial(self):
-        print("=================ser-start=================")
+        print("=================start=================")
         self.ser = serial.Serial(self.serial_port,self.baud_rate)
         
 
     def stop_serial(self):
         self.ser.close()
-        print("===================ser-end==================")
+        print("===================end==================")
 
         
 
@@ -70,5 +76,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     From = main_window()
     From.show()
+    #print("=================start================")
     app.exec_()
+    print("===================end==================")
 
