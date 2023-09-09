@@ -1,3 +1,5 @@
 *.log 
 tutorial-env/
+/program/arduino-read-env
 work/
+*env/
